@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import { Trash, Pencil, Plus } from 'react-bootstrap-icons';
 
  export default class App extends Component {
     
@@ -24,21 +25,25 @@ import 'bootstrap/dist/css/bootstrap.min.css';
         
     return (
       <div>
-            <table class="table">
+            <table className="table table-striped table-sm table-hover text-center">
                 <thead>
                     <tr>
                         <th scope="col">Employee</th>
-                        <th scope="col">ADD</th>
+                        <th scope="col" className="text-start"><Plus size={ 27 } /></th>
 
                     </tr>
                 </thead>
-                <tbody>
+                <tbody >
                         {this.state.employees.map(employee => (
 
                             <tr>
-                                <td>{employee.name}</td>
-                                <td>DELETE</td>
-                                <td>EDIT</td>
+                                <td >{employee.name}</td>
+                                <td className="text-start">
+                                    <Trash size={25} className="pe-2"/>
+                                    <Pencil  />
+                                   
+                                </td>
+                                
 
                             </tr>
                         ))}
