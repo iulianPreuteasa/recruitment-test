@@ -37,5 +37,49 @@ namespace InterviewTest.Controllers
 
             return employees;
         }
+
+        [HttpDelete]
+
+
+
+        public StatusCodeResult Delete(string name)
+        {
+            var connectionStringBuilder = new SqliteConnectionStringBuilder() { DataSource = "./SqliteDB.db" };
+            using (var connection = new SqliteConnection(connectionStringBuilder.ConnectionString))
+            {
+                connection.Open();
+
+                var queryCmd = connection.CreateCommand();
+                queryCmd.CommandText = @"DELETE FROM Employees WHERE Name = @NAME";
+                queryCmd.Parameters.AddWithValue("@NAME", name);
+                int result = queryCmd.ExecuteNonQuery();
+
+                if (result >= 1)
+                {
+                    return StatusCode(200);
+                }
+                return StatusCode(404);
+            }
+
+        }
+
+        [HttpPatch(Name = "updateEmployee")]
+        public Employee Patch(Employee employee)
+        {
+            var connectionStringBuilder = new SqliteConnectionStringBuilder() { DataSource = "./SqliteDB.db" };
+            using (var connection = new SqliteConnection(connectionStringBuilder.ConnectionString))
+            {
+                connection.Open();
+
+                var queryCmd = connection.CreateCommand();
+                queryCmd.CommandText = @"UPDATE Employees SET Value = @VALUE WHERE Name = @NAME";
+                queryCmd.Parameters.AddWithValue("@NAME", employee.Name);
+                queryCmd.Parameters.AddWithValue("@VALUE", employee.Value);
+                queryCmd.ExecuteNonQuery();
+
+                return employee;
+            }
+
+        }
     }
 }

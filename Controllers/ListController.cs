@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using InterviewTest.Model;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.Sqlite;
+using System.Collections.Generic;
 
 namespace InterviewTest.Controllers
 {
@@ -6,12 +9,14 @@ namespace InterviewTest.Controllers
     [Route("[controller]")]
     public class ListController : ControllerBase
     {
-        public ListController()
-        {
-        }
+
+        
 
         /*
          * List API methods goe here
          * */
+
+            
+
     }
 }
