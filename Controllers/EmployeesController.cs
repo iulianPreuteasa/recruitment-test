@@ -21,7 +21,7 @@ namespace InterviewTest.Controllers
                 connection.Open();
 
                 var queryCmd = connection.CreateCommand();
-                queryCmd.CommandText = @"SELECT Name, Value FROM Employees";
+                queryCmd.CommandText = @"SELECT Name, Value FROM Employees ORDER BY Name ASC";
                 using (var reader = queryCmd.ExecuteReader())
                 {
                     while (reader.Read())
@@ -63,7 +63,7 @@ namespace InterviewTest.Controllers
 
         }
 
-        [HttpPatch(Name = "updateEmployee")]
+        [HttpPatch("updateEmployee")]
         public Employee Patch(Employee employee)
         {
             var connectionStringBuilder = new SqliteConnectionStringBuilder() { DataSource = "./SqliteDB.db" };
@@ -73,6 +73,27 @@ namespace InterviewTest.Controllers
 
                 var queryCmd = connection.CreateCommand();
                 queryCmd.CommandText = @"UPDATE Employees SET Value = @VALUE WHERE Name = @NAME";
+
+                queryCmd.Parameters.AddWithValue("@NAME", employee.Name);
+                queryCmd.Parameters.AddWithValue("@VALUE", employee.Value);
+                queryCmd.ExecuteNonQuery();
+
+                return employee;
+            }
+
+        }
+
+
+        [HttpPost("addEmployee")]
+        public Employee Post(Employee employee)
+        {
+            var connectionStringBuilder = new SqliteConnectionStringBuilder() { DataSource = "./SqliteDB.db" };
+            using (var connection = new SqliteConnection(connectionStringBuilder.ConnectionString))
+            {
+                connection.Open();
+
+                var queryCmd = connection.CreateCommand();
+                queryCmd.CommandText = @"INSERT INTO Employees (Name, Value) VALUES (@NAME, @VALUE)";
                 queryCmd.Parameters.AddWithValue("@NAME", employee.Name);
                 queryCmd.Parameters.AddWithValue("@VALUE", employee.Value);
                 queryCmd.ExecuteNonQuery();

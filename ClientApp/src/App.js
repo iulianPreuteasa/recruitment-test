@@ -18,6 +18,8 @@ import { Trash, Pencil, Plus } from 'react-bootstrap-icons';
             employees       :[],
             baseURL         :"http://localhost:5000/Employees",
              baseQueryURL: "http://localhost:5000/Employees?",
+             formName : "",
+             formValue : 0,
             
          };
 
@@ -25,8 +27,21 @@ import { Trash, Pencil, Plus } from 'react-bootstrap-icons';
          this.handleValueChange = this.handleValueChange.bind(this);
      }
 
+     componentDidMount() {
+         fetch(this.state.baseURL)
+             .then(response => response.json())
+
+             .then(data => {
+
+                 this.setState({ employees: data.map(employee => ({ ...employee, newValue: 0 })) })
+
+             })
+
+             .catch(e => alert(e));
+
+     }
+
      deleteEmployee(index) {
-         console.log(this.state.employees);
 
          let employeeToDelete = this.state.employees[index].name;
 
@@ -50,9 +65,8 @@ import { Trash, Pencil, Plus } from 'react-bootstrap-icons';
 
          this.setState({ employees: updateEmployees });
 
-         // aici am facut hardcoding ca sa pot sa modific mai usor, dar o sa schimb dupa aia cu variabila din state :))
-         fetch("http://localhost:5000/Employees/updateEmployee" , {
-             method: "PATCH",
+         fetch(`${this.state.baseURL}/updateEmployee` , {
+             method: "PATCH",   
              headers: {
                  'Content-Type': 'application/json',
              },
@@ -60,10 +74,45 @@ import { Trash, Pencil, Plus } from 'react-bootstrap-icons';
                  Name: updateEmployees[index].name,
                  Value: updateEmployees[index].value,
              })
-         }).then(response => console.log(response));
+         }).then(response => response.json())
+             
+             
+             .catch(e => alert(e));
 
 
      }
+     
+     addEmployee(e) {
+         e.preventDefault();
+
+         const { formName, formValue } = this.state;
+
+
+         
+         fetch(`${this.state.baseURL}/addEmployee`, {
+             method: "POST",
+             headers: {
+                 'Content-Type': 'application/json',
+             },
+             body: JSON.stringify({
+                 Name: formName,
+                 Value: formValue,
+             })
+         }).then(response => response.json())
+             .then(data => {
+                 const modifiedData = { ...data, newValue: 0 };
+                
+                 this.setState(prevState => ({
+                     employees: [...prevState.employees, modifiedData]
+                 }));
+             }).then(this.setState({formName: "", formValue:0}))
+             .catch(e => alert(e));
+
+
+     }
+     
+
+    
 
      handleNameChange(e, index) {
          let { employees } = this.state;
@@ -89,14 +138,21 @@ import { Trash, Pencil, Plus } from 'react-bootstrap-icons';
          })
      }  
 
-     componentDidMount() {
-         fetch(this.state.baseURL)
-             .then(response => response.json())
-             .then(data => this.setState({ employees: data.map(employee => ({ ...employee, newValue: 0 })) }))
-             .catch(e => console.log(e));
-
+     handleFormValue(e) {
+         this.setState({
+             formValue: e.target.value
+             })
      }
 
+     handleFormName(e) {
+         this.setState({
+             formName: e.target.value
+             })
+     }
+
+     
+
+    
     
 
 
@@ -105,35 +161,49 @@ import { Trash, Pencil, Plus } from 'react-bootstrap-icons';
     render() {
 
         
+          
         
-    return (
-      <div>
-            <table className="table table-striped table-sm table-hover text-center">
+        return (
+
+            <div className="mb-3">
+                <div className="d-flex flex-column">
+                <p className="h4 text-center align-items-center">Add employee</p>
+                <form className = "d-flex flex-column w-100 align-items-center " >
+
+                        <input type="text" className="text-center form-control w-50" value={this.state.formName} onChange={(e)=> this.handleFormName(e) }  placeholder="Name" />
+                        <input type="number" className="text-center form-control w-50" value={this.state.formValue} placeholder="Value" onChange={(e)=> this.handleFormValue(e) } />
+                        <a className="text-center form-control w-50"><Plus type="button" onClick={(e) => this.addEmployee(e) } size={27} /></a>
+                </form>
+
+                </div>
+
+            <table className="table table-striped mt-3 table-sm table-hover text-center">
                 <thead>
-                    <tr>
-                        <th scope="col">Index</th>
-                        <th scope="col">Employee</th>
-                        <th scope="col">Value</th>
-                        <th scope="col"><a><Plus size={27} onClick={() => { alert("add employee") }} /></a></th>
+                    <tr className="w-100">
+                        <th scope="col" className="w-25">Index</th>
+                            <th scope="col" className="w-25">Employee</th>
+                            <th scope="col" className="w-25">Value / NewValue</th>
+
+                            <th scope="col" className="w-25"></th>
 
                     </tr>
                 </thead>
-                <tbody >
-                    {this.state.employees.map((employee, index) => (
+                <tbody className="w-100">
+                        {this.state.employees.sort((a, b) => a.name.localeCompare(b.name, undefined, { ignorePunctuation: true, sensitivity: 'base' })).map((employee, index) => (
 
-                            <tr key={index}>
-                                <td>{index}</td>
+                            <tr key={index} >
+                                <td className="w-25">{index}</td>
 
-                            <td ><input type="text" className="text-center form-control w-75" value={employee.name} onChange={(e) => this.handleNameChange(e,index) }   /></td>
-                            <td >{employee.value}<input type="number" className="text-center form-control w-75" onChange={(e) => this.handleValueChange(e, index)} placeholder="new value" value={employee.newValue}  /></td>
+                                <td className="w-25"><input type="text" className="text-center form-control w-75" value={employee.name} onChange={(e) => this.handleNameChange(e, index)} disabled={ true }   /></td>
+                                <td className="w-25"><div className="d-flex"><p className="w-50">{employee.value}</p><input type="number" className="text-center form-control w-25" onChange={(e) => this.handleValueChange(e, index)} placeholder="new value" value={employee.newValue} /></div></td>
 
 
-                                <td >
+                                <td className="w-25">
                                     <a>
-                                        <Trash size={25} className="pe-2" onClick={() => this.deleteEmployee( index )} />
+                                           <Trash type="button"  size={25} className="pe-2" onClick={() => this.deleteEmployee( index )} />
                                     </a>
                                     <a>
-                                        <Pencil onClick={() => this.editEmployee( index ) } />
+                                          <Pencil type="button" onClick={() => this.editEmployee( index ) } />
                                     </a>
                                    
                                 </td>
@@ -145,7 +215,7 @@ import { Trash, Pencil, Plus } from 'react-bootstrap-icons';
                 </tbody>
             </table>
 
-            
+           
 
        </div>
     );
