@@ -34,16 +34,16 @@ namespace InterviewTest.Controllers
                     }
                 }
             }
-
             return employees;
         }
 
         [HttpDelete]
-
-
-
         public StatusCodeResult Delete(string name)
         {
+            if (name == "" )
+            {
+                return StatusCode(404);
+            }
             var connectionStringBuilder = new SqliteConnectionStringBuilder() { DataSource = "./SqliteDB.db" };
             using (var connection = new SqliteConnection(connectionStringBuilder.ConnectionString))
             {
@@ -60,7 +60,6 @@ namespace InterviewTest.Controllers
                 }
                 return StatusCode(404);
             }
-
         }
 
         [HttpPatch("updateEmployee")]
@@ -80,9 +79,7 @@ namespace InterviewTest.Controllers
 
                 return employee;
             }
-
         }
-
 
         [HttpPost("addEmployee")]
         public Employee Post(Employee employee)
@@ -100,7 +97,6 @@ namespace InterviewTest.Controllers
 
                 return employee;
             }
-
         }
     }
 }
